@@ -1,10 +1,4 @@
 import jetbrains.buildServer.configs.kotlin.*
-import jetbrains.buildServer.configs.kotlin.buildFeatures.perfmon
-import jetbrains.buildServer.configs.kotlin.buildSteps.dockerCommand
-import jetbrains.buildServer.configs.kotlin.buildSteps.dockerCompose
-import jetbrains.buildServer.configs.kotlin.buildSteps.maven
-import jetbrains.buildServer.configs.kotlin.buildSteps.script
-import jetbrains.buildServer.configs.kotlin.triggers.vcs
 
 /*
 The settings script is an entry point for defining a TeamCity
@@ -31,50 +25,4 @@ To debug in IntelliJ Idea, open the 'Maven Projects' tool window (View
 version = "2022.10"
 
 project {
-
-    buildType(Build)
 }
-
-object Build : BuildType({
-    name = "Build"
-
-    vcs {
-        root(DslContext.settingsRoot)
-    }
-
-    steps {
-        dockerCommand {
-            commandType = build {
-                source = file {
-                    path = "demo/Dockerfile"
-                }
-            }
-        }
-        maven {
-            goals = "clean test"
-            runnerArgs = "-Dmaven.test.failure.ignore=true"
-        }
-        dockerCompose {
-            file = "demo/docker-compose.yml"
-        }
-        script {
-            scriptContent = "./demo/create-pr.sh"
-        }
-        script {
-            scriptContent = "./demo/gen.sh"
-        }
-        script {
-            scriptContent = "./demo/run.sh"
-        }
-    }
-
-    triggers {
-        vcs {
-        }
-    }
-
-    features {
-        perfmon {
-        }
-    }
-})
