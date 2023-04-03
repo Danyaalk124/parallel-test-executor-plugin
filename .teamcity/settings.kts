@@ -1,5 +1,6 @@
 import jetbrains.buildServer.configs.kotlin.*
 import jetbrains.buildServer.configs.kotlin.buildFeatures.perfmon
+import jetbrains.buildServer.configs.kotlin.buildSteps.script
 import jetbrains.buildServer.configs.kotlin.triggers.vcs
 
 /*
@@ -36,6 +37,23 @@ object Build : BuildType({
 
     vcs {
         root(DslContext.settingsRoot)
+    }
+
+    steps {
+        script {
+            name = "parallel"
+            scriptContent = """
+                setlocal enabledelayedexpansion
+                set /a i=0
+                for FOR /L %%x IN (1,1,5) do (
+                    set /a i+=1
+                    set command[!i!]=localhost
+                )
+                for /l %%i in (1,1,!i!) do (
+                    cmd /c !command[%%i]!
+                )
+            """.trimIndent()
+        }
     }
 
     triggers {
